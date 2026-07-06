@@ -40,15 +40,17 @@ async def search_anime(
     query = query.strip()
     pattern = f"%{query}%"
 
-    total = await session.scalar(select(func.count(Anime.id)).where(Anime.title.ilike(pattern)))
+    title_ci = Anime.title.collate("ru_icu")
+
+    total = await session.scalar(select(func.count(Anime.id)).where(title_ci.ilike(pattern)))
     pages = max(1, ceil((total or 0) / per_page))
     page = clamp_page(page, pages)
 
     result = await session.scalars(
         select(Anime)
-        .where(Anime.title.ilike(pattern))
+        .where(title_ci.ilike(pattern))
         .order_by(
-            (func.lower(Anime.title) == query.lower()).desc(),
+            (func.lower(title_ci) == query.lower()).desc(),
             Anime.title.asc(),
             Anime.id.asc(),
         )
