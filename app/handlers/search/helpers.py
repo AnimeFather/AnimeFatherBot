@@ -1,11 +1,34 @@
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import CallbackQuery
+from aiogram.types import Message
 
+from app.config import settings
+from app.database.models import Anime
 from app.database.session import Session
 from app.keyboards.catalog import episodes_keyboard
+from app.keyboards.catalog import seasons_keyboard
+from app.messages import anime_card_text
 from app.messages import episodes_text
 from app.services.catalog_service import get_episodes
 from app.services.catalog_service import get_season
+from app.services.catalog_service import get_seasons
+
+
+async def _send_anime_card(message: Message, session, anime: Anime) -> None:
+    seasons_page = await get_seasons(session, anime.id, page=1)
+    text = anime_card_text(anime)
+    keyboard = seasons_keyboard(anime.id, seasons_page)
+    if anime.poster_message_id:
+        await message.bot.copy_message(
+            chat_id=message.chat.id,
+            from_chat_id=settings.channel_id,
+            message_id=anime.poster_message_id,
+            caption=text,
+            parse_mode="HTML",
+            reply_markup=keyboard,
+        )
+    else:
+        await message.answer(text, parse_mode="HTML", reply_markup=keyboard)
 
 
 async def _show_episode_page(

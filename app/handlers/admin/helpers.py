@@ -150,7 +150,11 @@ async def _show_anime_editor(callback: CallbackQuery, anime_id: int) -> None:
     if anime is None:
         await callback.answer("Аниме не найдено.", show_alert=True)
         return
-    await _edit_or_answer(callback, f"Аниме: {anime.title}\n\nЧто изменить?", anime_edit_keyboard(anime.id))
+    await _edit_or_answer(
+        callback,
+        f"Аниме: {anime.title}\nID: {anime.id}\n\nЧто изменить?",
+        anime_edit_keyboard(anime.id),
+    )
 
 
 async def _show_season_editor(callback: CallbackQuery, season_id: int) -> None:

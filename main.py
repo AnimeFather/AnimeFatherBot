@@ -3,6 +3,7 @@ import logging
 
 from app.bot import bot
 from app.bot import dp
+from app.bot import setup_bot_commands
 from app.config import settings
 from app.database.session import create_tables
 from app.handlers import admin
@@ -19,6 +20,8 @@ async def main() -> None:
     logging.basicConfig(level=logging.INFO)
     if settings.auto_create_tables:
         await create_tables()
+
+    await setup_bot_commands()
 
     from app.handlers.admin.helpers import resume_incomplete_broadcasts
     asyncio.create_task(resume_incomplete_broadcasts(bot))

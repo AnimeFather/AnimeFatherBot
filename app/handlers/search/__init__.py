@@ -18,6 +18,7 @@ from app.callbacks import SeasonPageCallback
 from app.config import settings
 from app.database.session import Session
 from app.handlers.search.helpers import _edit_text_or_caption
+from app.handlers.search.helpers import _send_anime_card
 from app.handlers.search.helpers import _show_episode_page
 from app.keyboards.catalog import episodes_keyboard
 from app.keyboards.catalog import episode_video_keyboard
@@ -107,6 +108,13 @@ async def process_search(message: Message, state: FSMContext) -> None:
             first_name=message.from_user.first_name,
             last_name=message.from_user.last_name,
         )
+
+        if query.isdigit():
+            anime = await get_anime(session, int(query))
+            if anime is not None:
+                await _send_anime_card(message, session, anime)
+                return
+
         page = await search_anime(session, query, page=1)
 
     if page.total == 0:
