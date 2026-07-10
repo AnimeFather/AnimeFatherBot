@@ -12,7 +12,7 @@ router = Router()
 
 @router.message(CommandStart())
 async def start(message: Message) -> None:
-    await message.answer(start_text())
+    await message.answer(start_text(), parse_mode="HTML")
     async with Session() as session:
         await user_service.register_or_update(
             session,
